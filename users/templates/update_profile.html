@@ -1,0 +1,48 @@
+update user profile
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Update Profile</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'users/favicon.ico' %}"
+    />
+    <link rel="stylesheet" href="{% static 'users/styles.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Update Profile</h1>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value="{{ user.username }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value="{{ user.email }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="profile_picture">Profile Picture:</label>
+          <input type="file" id="profile_picture" name="profile_picture" />
+        </div>
+        <button type="submit">Update Profile</button>
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Logout</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'users/favicon.ico' %}"
+    />
+    <link rel="stylesheet" href="{% static 'users/styles.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Logout</h1>
+      <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to logout?</p>
+        <button type="submit">Logout</button>
+      </form>
+      <p><a href="{% url 'users:login' %}">Cancel</a></p>
+    </div>
+  </body>
+</html>
+<!-- This template is used to confirm the logout action. It includes a form that submits a POST request to log the user out. -->
+<!-- The user is prompted to confirm their intention to log out, and they can cancel the action by clicking the link to return to the login page. -->
