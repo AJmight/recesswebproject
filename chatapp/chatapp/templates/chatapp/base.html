@@ -10,4 +10,14 @@
             {% block content %}{% endblock %}
         </div>
     </body>
+
+    <script>
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission().then(function(permission) {
+                console.log("Notification permission:", permission);
+            });
+        }
+    </script>
+    
 </html>
+

@@ -87,28 +87,3 @@ def chat_view(request, username):
         'messages': messages,
     })
 
-
-# User = get_user_model()
-# @login_required
-# def chat_view(request, username):
-#     # Prevent chatting with yourself
-#     if request.user.username == username:
-#         return render(request, 'chatapp/404.html', status=404)
-
-#     try:
-#         # Get any user (therapist or not)
-#         other_user = User.objects.get(username=username)
-
-#         # Get all messages exchanged between the two
-#         messages = Message.objects.filter(
-#             sender__in=[request.user, other_user],
-#             receiver__in=[request.user, other_user]
-#         ).order_by('timestamp')
-
-#         return render(request, 'chatapp/chat_home.html', {
-#             'messages': messages,
-#             'other_user': other_user,
-#         })
-
-#     except User.DoesNotExist:
-#         return render(request, 'chatapp/404.html', status=404)

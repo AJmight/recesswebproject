@@ -34,12 +34,33 @@
         'ws://' + window.location.host + '/ws/chat/' + otherUser + '/'
     );
 
+
     socket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const msg = `<div><strong>${data.sender}:</strong> ${data.message}</div>`;
-        chatBox.innerHTML += msg;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    };
+    const data = JSON.parse(e.data);
+    const otherUser = "{{ other_user.username }}"; // this is static from template rendering
+    const user = "{{ request.user.username }}";
+
+    // Check if the sender is otherUser, and assign class accordingly
+    const divAlignmentClass = (data.sender === otherUser) ? 'text-left' : 'text-right';
+    const textAlignmentClass = (data.sender === otherUser) ? 'bg-gray-300 ' : 'bg-blue-500 text-white';
+
+    const msg = `<div class="${divAlignmentClass}">
+            <span class="inline-block px-3 py-2 rounded-lg  ${textAlignmentClass}">
+                ${data.message}
+            </span>
+        </div>`;
+
+    // Show browser notification if the sender is not the current user
+    if (data.sender !== user && Notification.permission === "granted") {
+        new Notification(`New message from ${data.sender}`, {
+            body: data.message,
+            icon: '/static/img/chat-icon.png' // Optional icon
+        });
+    }
+
+    chatBox.innerHTML += msg;
+    chatBox.scrollTop = chatBox.scrollHeight;
+};
 
     socket.onclose = function(e) {
         alert("Socket closed unexpectedly");
