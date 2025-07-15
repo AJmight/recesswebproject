@@ -34,6 +34,9 @@
         'ws://' + window.location.host + '/ws/chat/' + otherUser + '/'
     );
 
+    
+    
+
 
     socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
@@ -79,5 +82,8 @@
     messageInput.addEventListener("keyup", function(e) {
         if (e.key === "Enter") sendBtn.click();
     });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+    
 </script>
 {% endblock %}
