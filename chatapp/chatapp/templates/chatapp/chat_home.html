@@ -1,5 +1,6 @@
 {% extends 'chatapp/base.html' %}
 {% block title %}Therapists{% endblock %}
+{% load custom_tags %}
 
 {% block content %}
 <div class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg flex overflow-hidden">
@@ -15,12 +16,19 @@
         </form>
         <ul class="space-y-2">
             {% for contact in contacts %}
-                <li>
-                    <a href="{% url 'chat_room' contact.username %}" class="block p-2 rounded hover:bg-gray-100">
-                        {{ contact.username }}
-                    </a>
-                </li>
+                <a href="{% url 'chat_room' contact.username %}" class="flex justify-between items-center p-2 rounded hover:bg-gray-100">
+                    <span>{{ contact.username }}</span>
+
+                    {% with unread_counts|get_item:contact.username as unread %}
+                        {% if unread > 0 %}
+                            <span class="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                                {{ unread }}
+                            </span>
+                        {% endif %}
+                    {% endwith %}
+                </a>
             {% endfor %}
+
         </ul>
     </div>
 

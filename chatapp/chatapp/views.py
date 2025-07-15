@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .models import User, Message
 from django.shortcuts import get_object_or_404
 
-from django.db.models import Q
+from django.db.models import Count, Q
 
 def signup_view(request):
     if request.method == 'POST':
@@ -35,6 +35,29 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
+# @login_required
+# def chat_home(request):
+#     user = request.user
+
+#     if user.is_therapist:
+#         # Therapists see only users who have messaged them
+#         therapists_messages = Message.objects.filter(receiver=user).select_related('sender')
+#         user_ids = therapists_messages.values_list('sender__id', flat=True).distinct()
+#         contacts = User.objects.filter(id__in=user_ids, is_therapist=False)
+#     else:
+#         # Normal users see all therapists
+#         contacts = User.objects.filter(is_therapist=True)
+
+#     # Optional search filter
+#     query = request.GET.get('q')
+#     if query:
+#         contacts = contacts.filter(username__icontains=query)
+
+#     return render(request, 'chatapp/chat_home.html', {
+#         'contacts': contacts,
+#     })
+
+
 @login_required
 def chat_home(request):
     user = request.user
@@ -53,29 +76,29 @@ def chat_home(request):
     if query:
         contacts = contacts.filter(username__icontains=query)
 
+    # Build unread counts dictionary
+    unread_counts = {
+        contact.username: Message.objects.filter(
+            sender=contact,
+            receiver=user,
+            is_read=False
+        ).count()
+        for contact in contacts
+    }
+
     return render(request, 'chatapp/chat_home.html', {
         'contacts': contacts,
+        'unread_counts': unread_counts,
     })
 
-# def chat_home(request):
-#     user = request.user
-
-#     if user.is_therapist:
-#         # Therapist: see all unique users who messaged them
-#         messages = Message.objects.filter(receiver=user)
-#         contacts = set(msg.sender for msg in messages)
-#     else:
-#         # Normal user: see list of therapists
-#         contacts = User.objects.filter(is_therapist=True).exclude(id=user.id)
-
-#     return render(request, 'chatapp/chat_home.html', {
-#         'contacts': contacts,
-#     })
 
 @login_required
 def chat_view(request, username):
     other_user = get_object_or_404(User, username=username) # removed ,is_therapist=True in curly braces
     
+    # Mark unread messages as read
+    Message.objects.filter(sender=other_user, receiver=request.user, is_read=False).update(is_read=True)
+
     # Get previous messages between the two
     messages = Message.objects.filter(
         sender__in=[request.user, other_user],

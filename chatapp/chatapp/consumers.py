@@ -38,7 +38,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await sync_to_async(Message.objects.create)(
             sender=sender,
             receiver=receiver,
-            content=message
+            content=message,
+            is_read=False
         )
 
         # Broadcast to group
