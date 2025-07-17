@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | Assessment Results{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Your Assessment Results</h2>
+    <p class="lead text-center mb-5">Insights and feedback for "{{ user_assessment.assessment.name }}"</p>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Overall Score & Summary</h4>
+        </div>
+        <div class="card-body">
+            <p class="h5 mb-3"><strong>Score:</strong> <span class="text-primary">{{ user_assessment.score }}</span></p>
+            {% if feedback_data.summary %}
+                <p>{{ feedback_data.summary|linebreaksbr }}</p>
+            {% else %}
+                <p>No summary available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if feedback_data.insights %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Insights</h4>
+        </div>
+        <div class="card-body">
+            <p>{{ feedback_data.insights|linebreaksbr }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if feedback_data.recommendations %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0"><i class="fas fa-hand-holding-heart me-2"></i>Recommendations</h4>
+        </div>
+        <div class="card-body">
+            <p>{{ feedback_data.recommendations|linebreaksbr }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if feedback_data.therapist_types %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0"><i class="fas fa-user-md me-2"></i>Suggested Therapist Types</h4>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% for type in feedback_data.therapist_types %}
+                    <li><i class="fas fa-check-circle text-success me-2"></i>{{ type }}</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'users:therapist_directory' %}" class="btn btn-outline-primary btn-sm mt-3">
+                Browse Therapist Directory
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if feedback_data.resource_links %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0"><i class="fas fa-book-reader me-2"></i>Helpful Resources</h4>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% for resource in feedback_data.resource_links %}
+                    <li>
+                        <a href="{{ resource.url }}" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-2"></i>{{ resource.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'resources:resource_list' %}" class="btn btn-outline-primary btn-sm mt-3">
+                View More Resources
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if feedback_data.potential_concerns %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i>Potential Concerns</h4>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% for concern in feedback_data.potential_concerns %}
+                    <li><i class="fas fa-times-circle me-2"></i>{{ concern }}</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'core:crisis_support' %}" class="btn btn-outline-danger btn-sm mt-3">
+                Crisis Support
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <a href="{% url 'assessments:assessment_list' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Back to Assessments
+        </a>
+    </div>
+</div>
+{% endblock %}

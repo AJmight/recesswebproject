@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+   
+    {% if user.is_admin %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title text-primary"><i class="fas fa-user-shield me-2"></i>Admin Dashboard</h4>
+                <p>As an administrator, you can:</p>
+                <div class="row mt-4">
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card text-center h-100 shadow-sm">
+                            <div class="card-body">
+                                <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Therapists Pending Approval</h5>
+                                <p class="card-text display-4 text-danger">
+                                    {% if therapists_pending_approval is not None %}
+                                        {{ therapists_pending_approval }}
+                                    {% else %}
+                                        0 {# Default to 0 if not provided #}
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'users:admin_manage_therapists' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Review Therapists
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card text-center h-100 shadow-sm">
+                            <div class="card-body">
+                                <i class="fas fa-users fa-3x text-info mb-3"></i>
+                                <h5 class="card-title">Total Therapists</h5>
+                                <p class="card-text display-4 text-info">
+                                    {% if total_therapists is not None %}
+                                        {{ total_therapists }}
+                                    {% else %}
+                                        0 {# Default to 0 if not provided #}
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'users:admin_manage_therapists' %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-list me-1"></i>View All
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card text-center h-100 shadow-sm">
+                            <div class="card-body">
+                                <i class="fas fa-user-friends fa-3x text-success mb-3"></i>
+                                <h5 class="card-title">Total Clients</h5>
+                                <p class="card-text display-4 text-success">
+                                    {% if total_clients is not None %}
+                                        {{ total_clients }}
+                                    {% else %}
+                                        0 {# Default to 0 if not provided #}
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'users:admin_manage_clients' %}" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-search me-1"></i>View Clients
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 text-center">
+                    <h3>Quick Admin Actions</h3>
+                    <div class="d-flex flex-wrap justify-content-center gap-3 mt-3">
+                        <a href="{% url 'resources:manage_resources' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-book-medical me-2"></i>Manage Resources
+                        </a>
+                        <a href="{% url 'users:admin_manage_therapists' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-user-shield me-2"></i>Manage Therapists
+                        </a>
+                        <a href="{% url 'admin:index' %}" class="btn btn-dark btn-lg">
+                            <i class="fas fa-cog me-2"></i>Django Admin Panel
+                        </a>
+                        <a href="{% url 'chatapp:chat_home' %}" class="btn btn-info btn-lg">
+                            <i class="fas fa-comments me-2"></i>Access Chat
+                        </a>
+                        <a href="{% url 'assessments:manage_assessments' %}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-clipboard-list me-2"></i>Manage Assessments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif user.is_therapist %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title text-primary"><i class="fas fa-user-md me-2"></i>Therapist Dashboard</h4>
+                <p>As a mental health professional, you can:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{% url 'appointments:therapist_appointments' %}" class="btn btn-outline-primary"><i class="fas fa-users me-2"></i>View and manage client appointments</a></li>
+                    <li class="mb-2"><a href="{% url 'appointments:therapist_set_availability' %}" class="btn btn-outline-info"><i class="fas fa-clock me-2"></i>Set your availability</a></li>
+                    <li class="mb-2"><a href="{% url 'users:profile' %}" class="btn btn-outline-secondary"><i class="fas fa-user-edit me-2"></i>Manage your professional profile</a></li>
+                    <li class="mb-2"><a href="{% url 'chatapp:chat_home' %}" class="btn btn-info"><i class="fas fa-comments me-2"></i>Access Chat</a></li>
+                    <li class="mb-2"><a href="{% url 'assessments:assessment_list' %}" class="btn btn-warning"><i class="fas fa-clipboard-list me-2"></i>Take Assessments</a></li>
+                    <li class="mb-2"><a href="{% url 'assessments:my_results' %}" class="btn btn-outline-warning"><i class="fas fa-poll-h me-2"></i>View My Assessment Results</a></li> {# Kept for Therapists #}
+                </ul>
+                {% if not user.is_approved %}
+                    <div class="alert alert-warning mt-3" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Your account is awaiting admin approval. You will have full access once approved.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% elif user.is_client %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title text-primary"><i class="fas fa-user me-2"></i>Client Dashboard</h4>
+                <p>Hello dear sir/madam, on this page you can:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{% url 'appointments:book_appointment' %}" class="btn btn-outline-primary"><i class="fas fa-calendar-plus me-2"></i>Book a new appointment</a></li>
+                    <li class="mb-2"><a href="{% url 'appointments:client_appointments' %}" class="btn btn-outline-info"><i class="fas fa-calendar-check me-2"></i>View your appointments</a></li>
+                    <li class="mb-2"><a href="{% url 'resources:resource_list' %}" class="btn btn-outline-success"><i class="fas fa-book me-2"></i>Browse mental health resources</a></li>
+                    <li class="mb-2"><a href="{% url 'users:profile' %}" class="btn btn-outline-secondary"><i class="fas fa-user-edit me-2"></i>Manage your profile</a></li>
+                    <li class="mb-2"><a href="{% url 'chatapp:chat_home' %}" class="btn btn-info"><i class="fas fa-comments me-2"></i>Access Chat</a></li>
+                    <li class="mb-2"><a href="{% url 'assessments:assessment_list' %}" class="btn btn-warning"><i class="fas fa-clipboard-list me-2"></i>Take Assessments</a></li>
+                    {# Removed for Clients: <li class="mb-2"><a href="{% url 'assessments:my_results' %}" class="btn btn-outline-warning"><i class="fas fa-poll-h me-2"></i>View My Assessment Results</a></li> #}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fas fa-info-circle me-2"></i>Please select a role or contact support if you believe this is an error.
+            <p class="mt-2">If you're new, you can <a href="{% url 'users:register' %}">Register here</a>.</p>
+        </div>
+    {% endif %}
+
+    <p class="mt-4 text-center">Need immediate help? <a href="{% url 'core:crisis_support' %}" class="btn btn-danger btn-sm"><i class="fas fa-exclamation-circle me-2"></i>Crisis Support</a></p>
+</div>
+{% endblock %}

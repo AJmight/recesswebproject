@@ -42,12 +42,22 @@ INSTALLED_APPS = [
     'assessments',
     'appointments',
     'resources',
-    'messaging',
+    'chatapp',
     'core',
+    'widget_tweaks',
+    'channels'
     
 ]
 
-AUTH_USER_MODEL = 'users.CustomUser'
+# Django Channels Settings
+ASGI_APPLICATION = 'mental_health_platform.asgi.application' # Points to your project's asgi.py
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer', # For development, use Redis for production
+    },
+}
+
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,10 +74,11 @@ ROOT_URLCONF = 'mental_health_platform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], # <--- THIS LINE IS CRUCIAL
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug', # Add debug context processor
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -84,11 +95,14 @@ WSGI_APPLICATION = 'mental_health_platform.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mental_health',
+        'USER': 'postgres',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -150,6 +164,6 @@ AUTH_USER_MODEL = 'users.User'
 
 # Login and logout redirects
 
-LOGIN_REDIRECT_URL = 'users:dashboard'
-LOGIN_URL = 'users:login'
-LOGOUT_REDIRECT_URL = 'landing'
+LOGIN_REDIRECT_URL = 'core:dashboard' 
+LOGIN_URL = 'users:login'             
+LOGOUT_REDIRECT_URL = 'core:home' 

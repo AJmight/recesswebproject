@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %} {# THIS IS THE CRUCIAL LINE FOR 'add_class' #}
+
+{% block title %}MindCare | Register{% endblock %}
+
+{% block body_class %}auth-page{% endblock %} {# Add auth-page class to body #}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+          <br>
+            <br>
+            <br>
+            <h2>Create Your Account</h2>
+            <p class="text-muted">Join our mental health community</p>
+        </div>
+        
+        <form method="post" class="auth-form needs-validation" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>Registration Failed:</strong> Please correct the errors below.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+            
+            {# Render all visible fields from the form #}
+            {% for field in form.visible_fields %}
+                {% comment %}
+                    Fields like 'username', 'email', 'password', 'password2', 'first_name', 'last_name',
+                    'phone_number', 'address', 'role', 'bio', 'profile_picture' are always visible.
+                    Therapist-specific fields like 'specialization', 'location', 'qualifications',
+                    'experience_years', 'hourly_rate', 'available_days', 'available_hours_start',
+                    'available_hours_end', 'is_accepting_clients' will be conditionally hidden/shown.
+                {% endcomment %}
+                <div class="mb-3 
+                    {% if field.name == 'specialization' or field.name == 'location' or field.name == 'qualifications' or field.name == 'experience_years' or field.name == 'hourly_rate' or field.name == 'available_days' or field.name == 'available_hours_start' or field.name == 'available_hours_end' or field.name == 'is_accepting_clients' %}
+                        therapist-field d-none
+                    {% endif %}
+                ">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        <i class="fas 
+                            {% if field.name == 'username' %}fa-user{% elif field.name == 'email' %}fa-envelope{% elif field.name == 'password' or field.name == 'password2' %}fa-lock{% elif field.name == 'role' %}fa-user-tag{% elif field.name == 'first_name' or field.name == 'last_name' %}fa-id-card-alt{% elif field.name == 'phone_number' %}fa-phone{% elif field.name == 'address' %}fa-map-marker-alt{% elif field.name == 'specialization' %}fa-brain{% elif field.name == 'bio' %}fa-info-circle{% elif field.name == 'profile_picture' %}fa-image{% elif field.name == 'location' %}fa-map-pin{% elif field.name == 'qualifications' %}fa-graduation-cap{% elif field.name == 'experience_years' %}fa-calendar-alt{% elif field.name == 'hourly_rate' %}fa-dollar-sign{% elif field.name == 'available_days' %}fa-calendar-day{% elif field.name == 'available_hours_start' or field.name == 'available_hours_end' %}fa-clock{% elif field.name == 'is_accepting_clients' %}fa-user-check{% endif %} 
+                            me-2"></i>
+                        {{ field.label }}
+                        {% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+                    </label>
+                    
+                    {% if field.name == 'password' or field.name == 'password2' %}
+                        <div class="input-group">
+                            {{ field|add_class:"form-control" }}
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword{{ field.name|capfirst }}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    {% elif field.name == 'role' %}
+                        {{ field|add_class:"form-select" }}
+                    {% elif field.name == 'bio' or field.name == 'qualifications' %}
+                        {{ field|add_class:"form-control"|attr:"rows:4" }}
+                    {% elif field.name == 'profile_picture' %}
+                        <input type="file" id="{{ field.id_for_label }}" name="{{ field.name }}" accept="image/*" class="form-control">
+                        <img id="profile-preview" src="{% static 'images/default-profile.png' %}" alt="Profile Preview" class="img-thumbnail mt-2" style="max-width: 100px; display: none;">
+                    {% elif field.field.widget.input_type == 'checkbox' %}
+                        <div class="form-check">
+                            {{ field|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    {% else %}
+                        {{ field|add_class:"form-control" }}
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 auth-btn">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+            
+            <div class="auth-footer mt-3">
+                <p class="text-center">
+                    Already have an account? 
+                    <a href="{% url 'users:login' %}" class="auth-link">Sign in</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Terms of Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% include 'terms_content.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('id_role');
+        const therapistFields = document.querySelectorAll('.therapist-field');
+        const profilePictureInput = document.getElementById('id_profile_picture');
+        const profilePreview = document.getElementById('profile-preview');
+
+        function toggleTherapistFields() {
+            if (roleSelect.value === 'THERAPIST') {
+                therapistFields.forEach(field => field.classList.remove('d-none'));
+            } else {
+                therapistFields.forEach(field => field.classList.add('d-none'));
+            }
+        }
+
+        if (roleSelect) {
+            roleSelect.addEventListener('change', toggleTherapistFields);
+            // Initial call to set visibility based on pre-selected role (if any)
+            toggleTherapistFields(); 
+        }
+
+        // Toggle password visibility for password and password2 fields
+        function setupPasswordToggle(inputId, toggleId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = document.getElementById(toggleId);
+
+            if (passwordInput && toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    const toggleIcon = this.querySelector('i');
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleIcon.classList.remove('fa-eye');
+                        toggleIcon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleIcon.classList.remove('fa-eye-slash');
+                        toggleIcon.classList.add('fa-eye');
+                    }
+                });
+            }
+        }
+
+        setupPasswordToggle('id_password', 'togglePasswordPassword');
+        setupPasswordToggle('id_password2', 'togglePasswordPassword2'); // For password confirmation field
+
+        // Profile picture preview
+        if (profilePictureInput && profilePreview) {
+            profilePictureInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profilePreview.src = e.target.result;
+                        profilePreview.style.display = 'block'; // Show the preview
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    profilePreview.style.display = 'none'; // Hide if no file selected
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

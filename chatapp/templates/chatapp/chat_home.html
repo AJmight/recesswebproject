@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {# Changed to extend main base.html #}
+{% block title %}Chats{% endblock %} {# Changed title to be more generic for chat home #}
+{% load custom_tags %} {# Keep this for the get_item filter #}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-lg flex overflow-hidden" style="max-width: 800px; margin: auto;">
+        <div class="w-full md:w-1/3 border-r p-4">
+            <h2 class="text-xl font-bold mb-4">
+                {% if request.user.is_therapist %}Patients
+                {% else %} Therapists{% endif %}
+            </h2>
+
+            <form method="get" class="mb-4">
+                <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}" class="w-full p-2 border rounded">
+            </form>
+            <ul class="space-y-2">
+                {% for contact in contacts %}
+                    <a href="{% url 'chatapp:chat_room' contact.username %}" class="flex justify-between items-center p-2 rounded hover:bg-gray-100">
+                        <span>{{ contact.username }}</span>
+
+                        {% with unread_counts|get_item:contact.username as unread %}
+                            {% if unread > 0 %}
+                                <span class="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                                    {{ unread }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+                {% empty %}
+                    <li class="text-muted text-center">No contacts found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="hidden md:flex w-2/3 p-4 items-center justify-center text-gray-400">
+            <p>Select a contact to start chatting.</p>
+        </div>
+        {# Removed redundant logout button, it's in the main navbar #}
+    </div>
+</div>
+{% endblock %}

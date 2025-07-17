@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Resources{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Educational Resources</h2>
+    {% if resources %}
+        <ul class="list-group">
+            {% for resource in resources %}
+                <li class="list-group-item mb-3">
+                    <h4>{{ resource.title }}</h4>
+                    <p>{{ resource.description }}</p>
+                    <p class="text-muted"><small>Type: {{ resource.get_resource_type_display }}</small></p>
+                    {% if resource.file %}
+                        <a href="{{ resource.get_file_url }}" target="_blank" class="btn btn-sm btn-primary">Download File</a>
+                    {% elif resource.link %}
+                        <a href="{{ resource.link }}" target="_blank" class="btn btn-sm btn-info">View External Link</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No resources available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | My Assessment Results{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">My Past Assessment Results</h2>
+    <p class="lead text-center mb-5">Review your previously completed mental health assessments.</p>
+
+    {% if user_assessments %}
+        <div class="list-group">
+            {% for user_assessment in user_assessments %}
+            <a href="{% url 'assessments:assessment_result' user_assessment.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center flex-wrap mb-2 shadow-sm rounded">
+                <div class="flex-grow-1 me-2">
+                    <h5 class="mb-1 text-primary">{{ user_assessment.assessment.name }}</h5>
+                    <p class="mb-1 text-muted small">Completed on: {{ user_assessment.submitted_at|date:"M d, Y H:i" }}</p>
+                    <p class="mb-0">Your Score: <strong>{{ user_assessment.score }}</strong></p>
+                </div>
+                <span class="badge bg-primary rounded-pill mt-2 mt-md-0">View Details <i class="fas fa-arrow-right ms-1"></i></span>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fas fa-info-circle me-2"></i>You haven't completed any assessments yet. <a href="{% url 'assessments:assessment_list' %}" class="alert-link">Take one now!</a>
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <a href="{% url 'assessments:assessment_list' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-plus-circle me-2"></i>Take a New Assessment
+        </a>
+    </div>
+</div>
+{% endblock %}

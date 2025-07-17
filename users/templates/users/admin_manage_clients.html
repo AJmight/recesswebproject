@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | Manage Clients{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Manage Clients</h2>
+    <p class="lead text-center mb-5">View and manage client accounts on the platform.</p>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-users me-2"></i>Client Accounts</h5>
+        </div>
+        <div class="card-body">
+            {% if clients %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Full Name</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr id="client-row-{{ client.pk }}">
+                            <td>{{ client.username }}</td>
+                            <td>{{ client.email|default:"N/A" }}</td>
+                            <td>{{ client.get_full_name|default:"N/A" }}</td>
+                            <td>{{ client.phone_number|default:"N/A" }}</td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="{% url 'users:admin_edit_user' client.pk %}" class="btn btn-sm btn-outline-info me-2">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form action="{% url 'users:admin_manage_clients' %}" method="post" class="delete-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="client_id" value="{{ client.pk }}">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <i class="fas fa-info-circle me-2"></i>No client accounts found.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add confirmation dialog for delete buttons
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const clientId = this.querySelector('input[name="client_id"]').value;
+                const clientName = document.querySelector(`#client-row-${clientId} td:first-child`).textContent;
+                
+                // Using browser's built-in confirm
+                if (confirm(`Are you sure you want to delete client "${clientName}"? This action cannot be undone.`)) {
+                    // Submit via fetch API to stay on the same page
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: new FormData(this),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': this.querySelector('input[name="csrfmiddlewaretoken"]').value
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remove the row from the table
+                            document.querySelector(`#client-row-${clientId}`).remove();
+                            
+                            // Show success message
+                            alert(`Client "${clientName}" deleted successfully.`);
+                            
+                            // Reload if no clients left
+                            if (document.querySelectorAll('tbody tr').length === 0) {
+                                window.location.reload();
+                            }
+                        } else {
+                            alert('Error deleting client. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

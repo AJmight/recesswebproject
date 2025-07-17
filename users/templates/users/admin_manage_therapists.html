@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Manage Therapists{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Manage Therapists</h2>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Approved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for therapist in therapists %}
+                <tr>
+                    <td>{{ therapist.username }}</td>
+                    <td>{{ therapist.get_full_name }}</td>
+                    <td>{{ therapist.email }}</td>
+                    <td>
+                        {% if therapist.is_approved %}
+                            <span class="badge badge-success">Yes</span>
+                        {% else %}
+                            <span class="badge badge-warning">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{% url 'users:admin_toggle_therapist_approval' therapist.pk %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm {% if therapist.is_approved %}btn-warning{% else %}btn-success{% endif %}">
+                                {% if therapist.is_approved %}Unapprove{% else %}Approve{% endif %}
+                            </button>
+                        </form>
+                        <a href="{% url 'users:admin_edit_user' therapist.pk %}" class="btn btn-sm btn-info ml-2">Edit</a>
+                        </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No therapist accounts found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

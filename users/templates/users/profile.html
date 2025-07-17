@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card profile-card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>My Profile
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="profile-picture-container mb-4">
+                        <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+                             class="profile-picture" alt="Profile Picture">
+                    </div>
+                    <h4 class="mb-2">{{ user.username }}</h4>
+                    <p class="text-muted mb-4">{{ user.email }}</p>
+
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Role:</strong> <span class="badge bg-info">{{ user.get_role_display }}</span></p>
+                            {% if user.is_therapist %}
+                                <p><strong>Approval Status:</strong> 
+                                    {% if user.is_approved %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    {% endif %}
+                                </p>
+                                {% if user.specialization %}
+                                <p><strong>Specialization:</strong> {{ user.specialization }}</p>
+                                {% endif %}
+                                {% if user.bio %}
+                                <p><strong>Bio:</strong> {{ user.bio }}</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {# Add more profile details here if available, e.g., phone, address #}
+                            {% if user.phone_number %}
+                            <p><strong>Phone:</strong> {{ user.phone_number }}</p>
+                            {% endif %}
+                            {% if user.address %}
+                            <p><strong>Address:</strong> {{ user.address }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <a href="{% url 'users:edit_profile' %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

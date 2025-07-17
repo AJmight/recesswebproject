@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | Login{% endblock %}
+
+{% block body_class %}auth-page{% endblock %} {# Add auth-page class to body #}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+                <br>
+                <br>
+            <h2>Welcome Back</h2>
+            <p class="text-muted">Please sign in to continue your mental health journey</p>
+        </div>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            {# Django messages will be handled by base.html's {% include 'messages.html' %} #}
+            {# This specific error display for form.errors is kept for immediate feedback #}
+            {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>Login Failed:</strong> Please check your credentials and try again.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <label for="id_username" class="form-label">
+                    <i class="fas fa-user me-2"></i>Username
+                </label>
+                <input type="text" 
+                       class="form-control form-control-lg" 
+                       id="id_username" 
+                       name="username" 
+                       placeholder="Enter your username"
+                       required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="id_password" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Password
+                </label>
+                <div class="input-group">
+                    <input type="password" 
+                           class="form-control form-control-lg" 
+                           id="id_password" 
+                           name="password" 
+                           placeholder="Enter your password"
+                           required>
+                    <button class="btn btn-outline-secondary" 
+                            type="button" 
+                            id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_role" class="form-label">
+                    <i class="fas fa-user-tag me-2"></i>Role
+                </label>
+                <select class="form-select form-select-lg" id="id_role" name="role" required>
+                    <option value="">Select your role</option>
+                    <option value="ADMIN">
+                        Admin
+                    </option>
+                    <option value="THERAPIST">
+                        Therapist
+                    </option>
+                    <option value="CLIENT">
+                        Client
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                <label class="form-check-label" for="rememberMe">
+                    Remember me on this device
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 auth-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </button>
+            
+            <div class="auth-footer mt-4">
+                <p class="text-center">
+                    Don't have an account? 
+                    <a href="{% url 'users:register' %}" class="auth-link">Register here</a>
+                </p>
+                <p class="text-center mt-2">
+                    <a href="{% url 'password_reset' %}" class="auth-link">
+                        <i class="fas fa-question-circle me-1"></i>Forgot your password?
+                    </a>
+                </p>
+            </div>
+        </form>
+        
+        <!-- Support Information -->
+        <div class="support-info mt-4">
+            <div class="text-center">
+                <h6 class="text-muted mb-3">Need immediate support?</h6>
+                <a href="tel:+256700000000" class="btn btn-outline-danger btn-sm me-2">
+                    <i class="fas fa-phone me-1"></i>Crisis Line
+                </a>
+                <a href="https://wa.me/256700000000" class="btn btn-outline-success btn-sm">
+                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick links -->
+    <div class="quick-links mt-4">
+        <div class="text-center">
+            <h6 class="text-muted mb-3">Quick Access</h6>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="{% url 'users:login' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-sign-in-alt me-1"></i>Sign In Again
+                </a>
+                <a href="{% url 'users:register' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-user-plus me-1"></i>New Account
+                </a>
+                <a href="{% url 'core:home' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('id_password');
+        const toggleIcon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    });
+
+    // Client-side form validation (basic)
+    const form = document.querySelector('.auth-form');
+    form.addEventListener('submit', function(event) {
+        const username = document.getElementById('id_username');
+        const password = document.getElementById('id_password');
+        const role = document.getElementById('id_role');
+        
+        let isValid = true;
+
+        if (!username.value.trim()) {
+            username.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            username.classList.remove('is-invalid');
+        }
+
+        if (!password.value.trim()) {
+            password.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            password.classList.remove('is-invalid');
+        }
+
+        if (!role.value) { // Check if a role is selected
+            role.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            role.classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+
+    // Remove invalid class on input
+    document.querySelectorAll('.form-control, .form-select').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+{% endblock %}
+
+  

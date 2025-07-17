@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ title }}</h2>
+    <form method="post" enctype="multipart/form-data"> {# IMPORTANT: enctype for file uploads #}
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save Resource</button>
+        <a href="{% url 'resources:manage_resources' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

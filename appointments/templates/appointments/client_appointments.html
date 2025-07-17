@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>My Appointments</h2>
+    <h3>Upcoming Appointments</h3>
+    {% if upcoming_appointments %}
+        <ul class="list-group mb-4">
+            {% for appt in upcoming_appointments %}
+                <li class="list-group-item">
+                    With: {{ appt.therapist.get_full_name|default:appt.therapist.username }}<br>
+                    Time: {{ appt.start_time|date:"F d, Y H:i" }} - {{ appt.end_time|date:"H:i" }}<br>
+                    Status: <strong>{{ appt.get_status_display }}</strong>
+                    {% if appt.status == 'PENDING' or appt.status == 'CONFIRMED' %}
+                        <a href="{% url 'appointments:cancel_appointment' appt.pk %}" class="btn btn-sm btn-danger float-right ml-2" onclick="return confirm('Are you sure you want to cancel this appointment?');">Cancel</a>
+                    {% endif %}
+                    {% if appt.notes %}<p class="mt-2">Notes: {{ appt.notes }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No upcoming appointments.</p>
+    {% endif %}
+
+    <h3>Past Appointments</h3>
+    {% if past_appointments %}
+        <ul class="list-group">
+            {% for appt in past_appointments %}
+                <li class="list-group-item text-muted">
+                    With: {{ appt.therapist.get_full_name|default:appt.therapist.username }}<br>
+                    Time: {{ appt.start_time|date:"F d, Y H:i" }} - {{ appt.end_time|date:"H:i" }}<br>
+                    Status: {{ appt.get_status_display }}
+                    {% if appt.notes %}<p class="mt-2">Notes: {{ appt.notes }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No past appointments.</p>
+    {% endif %}
+    <a href="{% url 'appointments:book_appointment' %}" class="btn btn-success mt-3">Book New Appointment</a>
+</div>
+{% endblock %}

@@ -1,0 +1,542 @@
+/* static/css/style.css */
+
+/* --- Base Variables & Global Styles --- */
+:root {
+    /* Default (Anonymous/General) Colors */
+    --primary-color: #5D9CEC;
+    /* Softer Sky Blue */
+    --secondary-color: #8EB7E5;
+    /* Light Blue */
+    --accent-color: #FFD166;
+    /* Muted Gold */
+    --text-color: #2D3748;
+    /* Dark gray for readability */
+    --light-text-color: #718096;
+    --background-color: #F7FAFC;
+    /* Very light gray background */
+    --card-background: #FFFFFF;
+    --border-color: #E2E8F0;
+    --success-color: #48BB78;
+    /* Softer green */
+    --info-color: #4299E1;
+    --warning-color: #ED8936;
+    --danger-color: #F56565;
+    --footer-bg: #2D3748;
+    /* Dark footer */
+
+    /* Font Families */
+    --font-primary: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* --- Role-Based Color Overrides --- */
+/* Client Theme: Soft blues */
+body.role-client {
+    --primary-color: #7FB3D5;
+    /* Cadet Blue */
+    --secondary-color: #B7D9F2;
+    /* Powder Blue */
+    --accent-color: #F8C1D5;
+    /* Soft Pink */
+}
+
+/* Therapist Theme: Professional greens */
+body.role-therapist {
+    --primary-color: #81C784;
+    /* Soft Green */
+    --secondary-color: #C8E6C9;
+    /* Pale Green */
+    --accent-color: #FFE0B2;
+    /* Soft Peach */
+}
+
+/* Admin Theme: Calm purples */
+body.role-admin {
+    --primary-color: #9FA8DA;
+    /* Light Indigo */
+    --secondary-color: #E8EAF6;
+    /* Very Light Indigo */
+    --accent-color: #F48FB1;
+    /* Soft Pink */
+}
+
+/* --- General Body & Typography --- */
+body {
+    font-family: var(--font-primary);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding-top: 70px;
+    /* Space for fixed navbar */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+body.loaded {
+    opacity: 1;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    color: var(--primary-color);
+    margin-bottom: 1.25rem;
+}
+
+a {
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* --- Navbar Styling --- */
+.navbar {
+    background-color: var(--primary-color) !important;
+    /* Ensure custom primary color */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+    position: fixed;
+    /* Keep navbar fixed at top */
+    top: 0;
+    width: 100%;
+    z-index: 1030;
+    /* Ensure it's above other content */
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    /* Ensure brand text is white */
+}
+
+.navbar-brand i {
+    color: white;
+}
+
+.nav-link {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    color: white !important;
+    /* Ensure nav links are white */
+}
+
+.nav-link i {
+    min-width: 1.25rem;
+    text-align: center;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+    /* Highlight on hover */
+}
+
+/* --- Dropdowns --- */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1.5rem;
+    color: var(--text-color);
+}
+
+.dropdown-item i {
+    color: var(--primary-color);
+    margin-right: 0.75rem;
+}
+
+.dropdown-item:hover {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.dropdown-item:hover i {
+    color: white;
+}
+
+/* --- Main Content Container (default for pages extending base) --- */
+main.container {
+    padding: 2rem;
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* --- Alerts --- */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* --- Buttons --- */
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+    background-color: #E53E3E;
+    border-color: #E53E3E;
+}
+
+/* --- Footer --- */
+footer {
+    background-color: var(--footer-bg);
+    color: white;
+    padding: 2rem 0 1rem;
+}
+
+footer a {
+    color: #A0AEC0;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+footer .btn-danger {
+    margin-bottom: 1rem;
+}
+
+.social-icons a {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+/* --- Forms --- */
+.form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(93, 156, 236, 0.25);
+}
+
+/* Role-specific form focus states */
+body.role-client .form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(127, 179, 213, 0.25);
+}
+
+body.role-therapist .form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(129, 199, 132, 0.25);
+}
+
+body.role-admin .form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(159, 168, 218, 0.25);
+}
+
+/* --- Cards --- */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        margin-bottom: 0.5rem;
+    }
+
+    .dropdown-menu {
+        margin-left: 1rem;
+        width: calc(100% - 2rem);
+    }
+}
+
+@media (max-width: 768px) {
+    main.container {
+        /* Adjust padding for smaller screens */
+        padding: 1.5rem;
+    }
+
+    footer .text-md-end {
+        text-align: left !important;
+        margin-top: 1.5rem;
+    }
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* --- Utility Classes --- */
+.rounded-lg {
+    border-radius: 12px;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.03);
+}
+
+/* --- Auth Pages Specific Styles (Applies when body has .auth-page class) --- */
+body.auth-page {
+    background: linear-gradient(135deg, #f1faee 0%, #e9ecef 100%);
+    /* Light, calming gradient */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Allow content to stack */
+    align-items: center;
+    justify-content: center;
+    /* Center vertically */
+    padding: 20px;
+    padding-top: 0;
+    /* Remove top padding from base for auth pages */
+}
+
+body.auth-page main.container {
+    /* Override main container for auth pages */
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-grow: 1;
+    /* Allow it to take available space */
+    display: flex;
+    /* Use flex to center auth-container */
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    /* Increased slightly for better form layout */
+    margin: 0 auto;
+    /* Center horizontally */
+}
+
+.auth-card {
+    background: white;
+    border-radius: 16px;
+    /* Slightly more rounded */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    /* More prominent shadow */
+    overflow: hidden;
+    padding: 2rem;
+    border: none;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-logo {
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.auth-header h2 {
+    color: var(--primary-color);
+    /* Use primary color from theme */
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.auth-form .form-control,
+.auth-form .form-select {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.auth-form .form-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.auth-btn {
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+}
+
+.auth-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-weight: 500;
+    /* Added font-weight for visibility */
+}
+
+.auth-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* Specific styles for login/register form elements */
+.input-group .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--light-text-color);
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: var(--background-color);
+    border-color: var(--primary-color);
+}
+
+.support-info,
+.quick-links {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* Added shadow for consistency */
+}
+
+/* Profile Page */
+.profile-picture-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-upload-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: var(--primary-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-upload-btn:hover {
+    background: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.profile-card {
+    border-radius: 12px;
+    border: none;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .profile-picture-container {
+        width: 120px;
+        height: 120px;
+    }
+
+    .support-buttons .btn {
+        font-size: 0.875rem;
+    }
+}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | Logout{% endblock %}
+
+{% block body_class %}auth-page{% endblock %} {# Add auth-page class to body #}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card text-center">
+        <div class="auth-header">
+            <br>
+            <h2>Ready to sign out?</h2>
+            <p class="text-muted">Take care of yourself, and remember we're here when you need us</p>
+        </div>
+
+        <div class="logout-icon mb-4">
+            <i class="fas fa-sign-out-alt text-muted" style="font-size: 3rem;"></i>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="d-grid gap-3">
+                <button type="submit" class="btn btn-outline-primary auth-btn">
+                    <i class="fas fa-sign-out-alt me-2"></i>Yes, Sign Me Out
+                </button>
+                
+                <a href="{% url 'core:dashboard' %}" class="btn btn-light auth-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
+                </a>
+            </div>
+        </form>
+        
+        <!-- Support reminder -->
+        <div class="support-reminder mt-4 p-3 bg-light rounded">
+            <h6 class="text-primary mb-2">
+                <i class="fas fa-heart me-2"></i>Remember
+            </h6>
+            <p class="small text-muted mb-3">
+                If you're feeling overwhelmed or need support, our crisis line is available 24/7
+            </p>
+            <div class="support-buttons">
+                <a href="tel:+256700000000" class="btn btn-outline-danger btn-sm me-2">
+                    <i class="fas fa-phone me-1"></i>Crisis Line
+                </a>
+                <a href="https://wa.me/256700000000" class="btn btn-outline-success btn-sm">
+                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick links -->
+    <div class="quick-links mt-4">
+        <div class="text-center">
+            <h6 class="text-muted mb-3">Quick Access</h6>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="{% url 'users:login' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-sign-in-alt me-1"></i>Sign In Again
+                </a>
+                <a href="{% url 'users:register' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-user-plus me-1"></i>New Account
+                </a>
+                <a href="{% url 'core:home' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add smooth fade-in animation on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure the auth-card is styled correctly from CSS, then animate
+        const authCard = document.querySelector('.auth-card');
+        if (authCard) {
+            authCard.style.opacity = '0';
+            authCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                authCard.style.transition = 'all 0.6s ease';
+                authCard.style.opacity = '1';
+                authCard.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    });
+
+    // Confirm logout with gentle animation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const button = this.querySelector('button[type="submit"]');
+        if (button) {
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing out...';
+            button.disabled = true;
+        }
+    });
+</script>
+{% endblock %}

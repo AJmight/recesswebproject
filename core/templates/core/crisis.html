@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crisis Support - MindCare{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Emergency Alert Banner -->
+    <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+            <div>
+                <h4 class="alert-heading mb-1">Emergency Crisis Support</h4>
+                <p class="mb-0">If you are in immediate danger or having thoughts of self-harm, please contact emergency services immediately.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Crisis Support Content -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white text-dark">
+                    <h2 class="mb-0"><i class="fas fa-phone me-2"></i>Immediate Crisis Support</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Uganda Emergency Services -->
+                        <div class="col-md-6 mb-3">
+                            <div class="crisis-contact-card p-3 border rounded">
+                                <h5 class="text-danger"><i class="fas fa-ambulance me-2"></i>Emergency Services</h5>
+                                <p class="mb-2"><strong>Police:</strong> <a href="tel:999" class="btn btn-danger btn-sm">999</a></p>
+                                <p class="mb-2"><strong>Medical Emergency:</strong> <a href="tel:911" class="btn btn-danger btn-sm">911</a></p>
+                                <p class="mb-0"><strong>Fire Brigade:</strong> <a href="tel:999" class="btn btn-danger btn-sm">999</a></p>
+                            </div>
+                        </div>
+                        
+                        <!-- MindCare Crisis Line -->
+                        <div class="col-md-6 mb-3">
+                            <div class="crisis-contact-card p-3 border rounded bg-light">
+                                <h5 class="text-primary"><i class="fas fa-headset me-2"></i>MindCare Crisis Line</h5>
+                                <p class="mb-2"><strong>24/7 Crisis Support:</strong><br>
+                                <a href="tel:+256700000000" class="btn btn-primary btn-sm">+256 700 000 000</a></p>
+                                <p class="mb-0"><strong>WhatsApp Crisis Support:</strong><br>
+                                <a href="https://wa.me/256700000000" class="btn btn-success btn-sm" target="_blank">
+                                    <i class="fab fa-whatsapp me-1"></i>Chat Now
+                                </a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Crisis Resources -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white text-dark">
+                    <h3 class="mb-0"><i class="fas fa-life-ring me-2"></i>Additional Crisis Resources</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-phone-alt me-2 text-primary"></i>Uganda Crisis Support</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Uganda National Mental Health Helpline:</strong><br>
+                                    <a href="tel:+256414200000" class="btn btn-outline-primary btn-sm">+256 414 200 000</a>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Butabika National Referral Hospital:</strong><br>
+                                    <a href="tel:+256414200000" class="btn btn-outline-primary btn-sm">+256 414 200 000</a>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Kampala Crisis Center:</strong><br>
+                                    <a href="tel:+256701234567" class="btn btn-outline-primary btn-sm">+256 701 234 567</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-comment-medical me-2 text-success"></i>Text & Online Support</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Crisis Text Line:</strong><br>
+                                    Text <strong>MINDCARE</strong> to <strong>40404</strong>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>MindCare Online Chat:</strong><br>
+                                    <a href="{% url 'chatapp:chat_home' %}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-comments me-1"></i>Start Chat
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Crisis Email Support:</strong><br>
+                                    <a href="mailto:crisis@mindcare.ug" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-envelope me-1"></i>crisis@mindcare.ug
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crisis Assessment Tool -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white text-dark">
+                    <h3 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Crisis Assessment</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">If you're unsure about the severity of your situation, this quick assessment can help determine the appropriate level of support.</p>
+                    <div id="crisisAssessment">
+                        <div class="question mb-3" id="question1">
+                            <h5>Are you currently having thoughts of hurting yourself or others?</h5>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-danger" onclick="assessmentResponse('q1', 'yes')">Yes</button>
+                                <button type="button" class="btn btn-outline-warning" onclick="assessmentResponse('q1', 'sometimes')">Sometimes</button>
+                                <button type="button" class="btn btn-outline-success" onclick="assessmentResponse('q1', 'no')">No</button>
+                            </div>
+                        </div>
+                        <div class="question mb-3 d-none" id="question2">
+                            <h5>Do you feel like you have no one to turn to?</h5>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-danger" onclick="assessmentResponse('q2', 'yes')">Yes</button>
+                                <button type="button" class="btn btn-outline-warning" onclick="assessmentResponse('q2', 'somewhat')">Somewhat</button>
+                                <button type="button" class="btn btn-outline-success" onclick="assessmentResponse('q2', 'no')">No</button>
+                            </div>
+                        </div>
+                        <div id="assessmentResult" class="d-none mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coping Strategies -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white text-dark">
+                    <h3 class="mb-0"><i class="fas fa-heart me-2"></i>Immediate Coping Strategies</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-lungs me-2 text-info"></i>Grounding Techniques</h5>
+                            <ul>
+                                <li>Take slow, deep breaths (4 counts in, hold 4, out 4)</li>
+                                <li>Name 5 things you can see, 4 you can touch, 3 you can hear</li>
+                                <li>Hold an ice cube or splash cold water on your face</li>
+                                <li>Focus on your feet touching the ground</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-phone-friends me-2 text-primary"></i>Reach Out</h5>
+                            <ul>
+                                <li>Call a trusted friend or family member</li>
+                                <li>Contact your MindCare counselor</li>
+                                <li><a href="{% url 'chatapp:chat_home' %}" class="text-decoration-none">Join our online support group</a></li>
+                                <li>Visit a safe, public place</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Remember:</strong> Crisis feelings are temporary. You have survived difficult times before, and you can get through this too.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Action Cards -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="tel:+256700000000" class="list-group-item list-group-item-action">
+                            <i class="fas fa-phone text-danger me-2"></i>Call Crisis Line
+                        </a>
+                        <a href="{% url 'chatapp:chat_home' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-comment-dots text-primary me-2"></i>Start Online Chat
+                        </a>
+                        <a href="mailto:crisis@mindcare.ug" class="list-group-item list-group-item-action">
+                            <i class="fas fa-envelope text-info me-2"></i>Email Support
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showNearestFacility()">
+                            <i class="fas fa-map-marker-alt text-success me-2"></i>Find Nearest Facility
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Groups -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-purple text-white">
+                    <h4 class="mb-0"><i class="fas fa-users me-2"></i>Support Groups</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Connect with others who understand your experience.</p>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <strong>Evening Support Circle</strong><br>
+                            <small class="text-muted">Daily 7-8 PM (Virtual)</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <strong>Peer Support Network</strong><br>
+                            <small class="text-muted">24/7 Online Community</small>
+                        </div>
+                    </div>
+                    <a href="{% url 'chatapp:chat_home' %}" class="btn btn-outline-purple btn-block mt-2">
+                        <i class="fas fa-users me-2"></i>Join Support Group
+                    </a>
+                </div>
+            </div>
+
+            <!-- Resources -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-book me-2"></i>Helpful Resources</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'resources:resource_list' %}" class="text-decoration-none">
+                                <i class="fas fa-hand-holding-heart me-2"></i>Self-Help Tools
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'resources:resource_list' %}" class="text-decoration-none">
+                                <i class="fas fa-leaf me-2"></i>Guided Meditation
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'resources:resource_list' %}" class="text-decoration-none">
+                                <i class="fas fa-clipboard-list me-2"></i>Emergency Planning
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'resources:resource_list' %}" class="text-decoration-none">
+                                <i class="fas fa-family me-2"></i>Family Support Guide
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Message -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body text-center">
+                    <h4 class="text-primary mb-3">You Are Not Alone</h4>
+                    <p class="mb-3">Remember that seeking help is a sign of strength, not weakness. Our trained crisis counselors are here to support you 24/7.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <blockquote class="blockquote">
+                                <p class="mb-0">"The darkest nights produce the brightest stars. You have the strength to overcome this difficult time."</p>
+                                <footer class="blockquote-footer mt-2">MindCare Crisis Support Team</footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Crisis Assessment Logic
+let assessmentResponses = {};
+
+function assessmentResponse(question, response) {
+    assessmentResponses[question] = response;
+    
+    if (question === 'q1') {
+        if (response === 'yes') {
+            showImmediateHelp();
+            return;
+        } else {
+            document.getElementById('question2').classList.remove('d-none');
+        }
+    } else if (question === 'q2') {
+        showAssessmentResult();
+    }
+}
+
+function showImmediateHelp() {
+    document.getElementById('assessmentResult').innerHTML = `
+        <div class="alert alert-danger">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Immediate Support Needed</h5>
+            <p>Based on your responses, we strongly recommend contacting emergency services or our crisis line immediately.</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="tel:999" class="btn btn-danger">Emergency: 999</a>
+                <a href="tel:+256700000000" class="btn btn-primary">Crisis Line</a>
+            </div>
+        </div>
+    `;
+    document.getElementById('assessmentResult').classList.remove('d-none');
+}
+
+function showAssessmentResult() {
+    let resultHTML = '';
+    
+    if (assessmentResponses.q1 === 'sometimes' || assessmentResponses.q2 === 'yes') {
+        resultHTML = `
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-info-circle me-2"></i>Support Recommended</h5>
+                <p>We recommend speaking with a crisis counselor to help you work through these feelings.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="tel:+256700000000" class="btn btn-warning">Call Crisis Line</a>
+                    <a href="{% url 'chatapp:chat_home' %}" class="btn btn-outline-primary">Start Chat</a>
+                </div>
+            </div>
+        `;
+    } else {
+        resultHTML = `
+            <div class="alert alert-success">
+                <h5><i class="fas fa-check-circle me-2"></i>Support Available</h5>
+                <p>While you may not be in immediate crisis, support is still available. Consider scheduling a check-in or exploring our self-help resources.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'appointments:book_appointment' %}" class="btn btn-success">Schedule Appointment</a>
+                    <a href="{% url 'resources:resource_list' %}" class="btn btn-outline-info">View Resources</a>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('assessmentResult').innerHTML = resultHTML;
+    document.getElementById('assessmentResult').classList.remove('d-none');
+}
+
+// Location Functions
+function showNearestFacility() {
+    // This would typically involve geolocation API and map integration.
+    // For now, a placeholder message or a redirect to a map page.
+    alert('Finding nearest MindCare facility... This would typically open a map or location service.');
+}
+
+// Emergency scroll to top on page load
+window.addEventListener('load', function() {
+    window.scrollTo(0, 0);
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bg-purple {
+    background-color: #6f42c1;
+}
+
+.btn-outline-purple {
+    color: #6f42c1;
+    border-color: #6f42c1;
+}
+
+.btn-outline-purple:hover {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.crisis-contact-card {
+    transition: all 0.3s ease;
+}
+
+.crisis-contact-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.question {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-block {
+    width: 100%;
+}
+</style>
+{% endblock %}

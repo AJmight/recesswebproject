@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}My Appointments (Therapist){% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>My Appointments (Therapist)</h2>
+    
+    <div class="mb-4">
+        <a href="{% url 'appointments:therapist_set_availability' %}" class="btn btn-info">Manage My Availability</a>
+    </div>
+
+    <h3>Upcoming Client Appointments</h3>
+    {% if upcoming_appointments %}
+        <ul class="list-group mb-4">
+            {% for appt in upcoming_appointments %}
+                <li class="list-group-item">
+                    Client: {{ appt.client.get_full_name|default:appt.client.username }}<br>
+                    Time: {{ appt.start_time|date:"F d, Y H:i" }} - {{ appt.end_time|date:"H:i" }}<br>
+                    Status: <strong>{{ appt.get_status_display }}</strong>
+                    <form method="post" action="{% url 'appointments:manage_appointment_status' appt.pk %}" class="form-inline float-right">
+                        {% csrf_token %}
+                        <select name="status" class="form-control form-control-sm mr-2">
+                            <option value="PENDING" {% if appt.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                            <option value="CONFIRMED" {% if appt.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+                            <option value="CANCELLED" {% if appt.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                            <option value="COMPLETED" {% if appt.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update Status</button>
+                    </form>
+                    {% if appt.notes %}<p class="mt-2">Notes from client: {{ appt.notes }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No upcoming client appointments.</p>
+    {% endif %}
+
+    <h3>Past Client Appointments</h3>
+    {% if past_appointments %}
+        <ul class="list-group">
+            {% for appt in past_appointments %}
+                <li class="list-group-item text-muted">
+                    Client: {{ appt.client.get_full_name|default:appt.client.username }}<br>
+                    Time: {{ appt.start_time|date:"F d, Y H:i" }} - {{ appt.end_time|date:"H:i" }}<br>
+                    Status: {{ appt.get_status_display }}
+                    {% if appt.notes %}<p class="mt-2">Notes from client: {{ appt.notes }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No past client appointments.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Edit User: {{ user_to_edit.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit User: {{ user_to_edit.username }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'users:admin_manage_therapists' %}" class="btn btn-secondary">Back to Therapists</a>
+    </form>
+</div>
+{% endblock %}
