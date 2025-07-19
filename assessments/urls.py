@@ -23,4 +23,7 @@ urlpatterns = [
     path('manage/questions/<int:assessment_id>/add/', views.add_question, name='add_question'),
     path('manage/questions/edit/<int:pk>/', views.edit_question, name='edit_question'),
     path('manage/questions/delete/<int:pk>/', views.delete_question, name='delete_question'),
+    
+    path('upload/', views.upload_assessment, name='upload_assessment'), # NEW: Upload assessment via JSON
 ]
+

@@ -1,44 +1,40 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}MindCare | Assessments{% endblock %}
+{% block title %}MindCare | Available Assessments{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-center mb-4">Mental Health Assessments</h2>
-    <p class="lead text-center mb-5">Take a self-assessment to gain insights into your mental well-being.</p>
+    <h2 class="text-center mb-4">Available Assessments</h2>
+    <p class="lead text-center mb-5">Choose an assessment to gain insights into your mental well-being.</p>
 
     {% if assessments %}
-        <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for assessment in assessments %}
             <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">{{ assessment.name }}</h5>
-                        <p class="card-text">{{ assessment.description|truncatechars:150 }}</p>
-                        <a href="{% url 'assessments:take_assessment' assessment.id %}" class="btn btn-primary mt-3">
-                            <i class="fas fa-play-circle me-2"></i>Take Assessment
-                        </a>
-                    </div>
-                    <div class="card-footer text-muted small">
-                        Created: {{ assessment.created_at|date:"M d, Y" }}
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-primary mb-2">
+                            <i class="fas fa-clipboard-list me-2"></i>{{ assessment.name }}
+                        </h5>
+                        <p class="card-text flex-grow-1">
+                            {{ assessment.description|truncatechars:150 }}
+                        </p>
+                        {# REMOVED: Mandatory badge display #}
+                        <div class="mt-auto text-center">
+                            <a href="{% url 'assessments:take_assessment' assessment.id %}" class="btn btn-info btn-sm mt-2">
+                                <i class="fas fa-play-circle me-1"></i>Take Assessment
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-info text-center" role="alert">
-            <i class="fas fa-info-circle me-2"></i>No assessments available yet. Check back soon!
+        <div class="alert alert-info text-center mt-5" role="alert">
+            <i class="fas fa-info-circle me-2"></i>No assessments are currently available.
         </div>
-    {% endif %}
-
-    {% if user.is_authenticated and user.is_admin %}
-    <div class="text-center mt-5">
-        <a href="{% url 'assessments:manage_assessments' %}" class="btn btn-secondary btn-lg">
-            <i class="fas fa-cog me-2"></i>Manage Assessments
-        </a>
-    </div>
     {% endif %}
 </div>
 {% endblock %}

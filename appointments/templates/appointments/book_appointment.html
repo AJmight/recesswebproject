@@ -4,7 +4,6 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Book a New Appointment</h2>
-    {% include 'messages.html' %} {# For Django messages #}
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}

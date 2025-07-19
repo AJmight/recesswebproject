@@ -6,7 +6,8 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Welcome, {{ user.get_full_name|default:user.username }}!</h2>
-   
+    {# {% include 'messages.html' %} -- REMOVED: Messages are now handled by base.html #}
+
     {% if user.is_admin %}
         <div class="card shadow-sm mb-4">
             <div class="card-body">
@@ -19,8 +20,8 @@
                                 <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
                                 <h5 class="card-title">Therapists Pending Approval</h5>
                                 <p class="card-text display-4 text-danger">
-                                    {% if therapists_pending_approval is not None %}
-                                        {{ therapists_pending_approval }}
+                                    {% if therapists_pending_approval_count is not None %}
+                                        {{ therapists_pending_approval_count }}
                                     {% else %}
                                         0 {# Default to 0 if not provided #}
                                     {% endif %}
@@ -37,8 +38,8 @@
                                 <i class="fas fa-users fa-3x text-info mb-3"></i>
                                 <h5 class="card-title">Total Therapists</h5>
                                 <p class="card-text display-4 text-info">
-                                    {% if total_therapists is not None %}
-                                        {{ total_therapists }}
+                                    {% if total_therapists_count is not None %}
+                                        {{ total_therapists_count }}
                                     {% else %}
                                         0 {# Default to 0 if not provided #}
                                     {% endif %}
@@ -55,8 +56,8 @@
                                 <i class="fas fa-user-friends fa-3x text-success mb-3"></i>
                                 <h5 class="card-title">Total Clients</h5>
                                 <p class="card-text display-4 text-success">
-                                    {% if total_clients is not None %}
-                                        {{ total_clients }}
+                                    {% if total_clients_count is not None %}
+                                        {{ total_clients_count }}
                                     {% else %}
                                         0 {# Default to 0 if not provided #}
                                     {% endif %}
@@ -87,6 +88,9 @@
                         <a href="{% url 'assessments:manage_assessments' %}" class="btn btn-warning btn-lg">
                             <i class="fas fa-clipboard-list me-2"></i>Manage Assessments
                         </a>
+                        <a href="{% url 'assessments:upload_assessment' %}" class="btn btn-success btn-lg"> {# NEW: Upload Assessment Link #}
+                            <i class="fas fa-file-upload me-2"></i>Upload Assessment
+                        </a>
                     </div>
                 </div>
             </div>
@@ -102,7 +106,7 @@
                     <li class="mb-2"><a href="{% url 'users:profile' %}" class="btn btn-outline-secondary"><i class="fas fa-user-edit me-2"></i>Manage your professional profile</a></li>
                     <li class="mb-2"><a href="{% url 'chatapp:chat_home' %}" class="btn btn-info"><i class="fas fa-comments me-2"></i>Access Chat</a></li>
                     <li class="mb-2"><a href="{% url 'assessments:assessment_list' %}" class="btn btn-warning"><i class="fas fa-clipboard-list me-2"></i>Take Assessments</a></li>
-                    <li class="mb-2"><a href="{% url 'assessments:my_results' %}" class="btn btn-outline-warning"><i class="fas fa-poll-h me-2"></i>View My Assessment Results</a></li> {# Kept for Therapists #}
+                    <li class="mb-2"><a href="{% url 'assessments:my_results' %}" class="btn btn-outline-warning"><i class="fas fa-poll-h me-2"></i>View My Assessment Results</a></li>
                 </ul>
                 {% if not user.is_approved %}
                     <div class="alert alert-warning mt-3" role="alert">
@@ -123,7 +127,6 @@
                     <li class="mb-2"><a href="{% url 'users:profile' %}" class="btn btn-outline-secondary"><i class="fas fa-user-edit me-2"></i>Manage your profile</a></li>
                     <li class="mb-2"><a href="{% url 'chatapp:chat_home' %}" class="btn btn-info"><i class="fas fa-comments me-2"></i>Access Chat</a></li>
                     <li class="mb-2"><a href="{% url 'assessments:assessment_list' %}" class="btn btn-warning"><i class="fas fa-clipboard-list me-2"></i>Take Assessments</a></li>
-                    {# Removed for Clients: <li class="mb-2"><a href="{% url 'assessments:my_results' %}" class="btn btn-outline-warning"><i class="fas fa-poll-h me-2"></i>View My Assessment Results</a></li> #}
                 </ul>
             </div>
         </div>

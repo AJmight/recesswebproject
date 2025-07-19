@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindCare | Find a Therapist{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Find a Therapist</h2>
+    <p class="lead text-center mb-5">Browse our directory of approved mental health professionals.</p>
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <form method="get" class="d-flex">
+                <input type="search" name="q" class="form-control me-2" placeholder="Search by name, specialization, or location..." value="{{ query }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    {% if therapists %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for therapist in therapists %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-primary mb-2">
+                            <i class="fas fa-user-md me-2"></i>{{ therapist.username }}
+                        </h5>
+                        <p class="card-text mb-1">
+                            <strong>Specialization:</strong> {{ therapist.specialization|default:"Not specified" }}
+                        </p>
+                        <p class="card-text mb-1">
+                            <strong>Location:</strong> {{ therapist.location|default:"Not specified" }}
+                        </p>
+                        <p class="card-text flex-grow-1">
+                            <strong>Bio:</strong> {{ therapist.bio|truncatechars:150|default:"No bio provided." }}
+                        </p>
+
+                        {# Display Availability Information #}
+                        <div class="mt-2 pt-2 border-top">
+                            <p class="card-text mb-1">
+                                <strong>Status:</strong> 
+                                {% if therapist.is_accepting_clients %}
+                                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepting New Clients</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Not Accepting New Clients</span>
+                                {% endif %}
+                            </p>
+                            <p class="card-text mb-1">
+                                <strong>Available Days:</strong> {{ therapist.available_days|default:"Not specified" }}
+                            </p>
+                            <p class="card-text mb-1">
+                                <strong>Available Hours:</strong> 
+                                {% if therapist.available_hours_start and therapist.available_hours_end %}
+                                    {{ therapist.available_hours_start|time:"H:i" }} - {{ therapist.available_hours_end|time:"H:i" }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="mt-auto text-center">
+                            <a href="{% url 'chatapp:chat_room' therapist.username %}" class="btn btn-success btn-sm mt-2">
+                                <i class="fas fa-comments me-1"></i>Chat with {{ therapist.username }}
+                            </a>
+                            {# CORRECTED URL: Pass therapist username as a query parameter #}
+                            <a href="{% url 'appointments:book_appointment' %}?therapist_username={{ therapist.username }}" class="btn btn-outline-info btn-sm mt-2 ms-2">Book Appointment</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center mt-5" role="alert">
+            <i class="fas fa-info-circle me-2"></i>No approved therapists found matching your criteria.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

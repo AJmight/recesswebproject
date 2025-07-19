@@ -51,11 +51,26 @@ INSTALLED_APPS = [
 
 # Django Channels Settings
 ASGI_APPLICATION = 'mental_health_platform.asgi.application' # Points to your project's asgi.py
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer', # For development, use Redis for production
-    },
-}
+# settings.py
+
+if DEBUG:
+    print("⚠️  Development mode: In-Memory Channel Layer")
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        }
+    }
+else:
+    print("✅ Production mode: Redis Channel Layer")
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('127.0.0.1', 6379)],
+            },
+        }
+    }
+
 
 AUTH_USER_MODEL = 'users.User'
 

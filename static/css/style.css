@@ -540,3 +540,14 @@ body.auth-page main.container {
         font-size: 0.875rem;
     }
 }
+.message-outgoing {
+    background: linear-gradient(to right, #3b82f6, #6366f1);
+    /* blue-indigo */
+    color: white;
+}
+
+.message-incoming {
+    background: #f7f7f7;
+    color: #333;
+    border: 1px solid #ddd;
+}

@@ -22,19 +22,14 @@
         <!-- Messages Container -->
         <div id="chat-messages" class="h-96 p-4 overflow-y-auto bg-gray-50 space-y-3">
             {% for message in messages %}
-            <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
-                <div class="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg px-4 py-2 
-                    {% if message.sender == request.user %}
-                        bg-gradient-to-r from-blue-500 to-indigo-500 text-white
-                    {% else %}
-                        bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-200
-                    {% endif %}">
-                    <div class="text-xs opacity-80 mb-1 {% if message.sender == request.user %}text-blue-100{% else %}text-gray-500{% endif %}">
-                        {{ message.sender.username }} • {{ message.timestamp|date:"H:i" }}
+                <div class="flex {% if message.sender.username == request.user.username %}justify-end{% else %}justify-start{% endif %}">
+                    <div class="{% if message.sender.username == request.user.username %}message-outgoing{% else %}message-incoming{% endif %}">
+                        <div class="text-xs opacity-80 mb-1 {% if message.sender == request.user %}text-blue-100{% else %}text-gray-500{% endif %}">
+                            {{ message.sender.username }} • {{ message.timestamp|date:"H:i" }}
+                        </div>
+                        <p class="break-words">{{ message.content }}</p>
                     </div>
-                    <p class="break-words">{{ message.content }}</p>
                 </div>
-            </div>
             {% endfor %}
         </div>
 
@@ -60,88 +55,70 @@
         const sendButton = document.getElementById('send-button');
         const currentUser = "{{ request.user.username }}";
         const otherUser = "{{ other_user.username }}";
-        
-        // Scroll to bottom initially
+
         chatBox.scrollTop = chatBox.scrollHeight;
-        
-        // Request notification permission
+
         if (Notification.permission !== "granted") {
             Notification.requestPermission();
         }
 
-        // WebSocket connection
-        const socket = new WebSocket(
-            'ws://' + window.location.host + 
-            '/ws/chat/' + otherUser + '/'
+        // Connect to the WebSocket
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + otherUser + '/'
         );
 
-        socket.onmessage = function(e) {
+        chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const message = data.message;
-            const sender = data.sender;
-            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            // Create message element
+            const sender = data.sender_username;
+            const timestamp = data.timestamp;
+
             const messageDiv = document.createElement('div');
             messageDiv.className = `flex ${sender === currentUser ? 'justify-end' : 'justify-start'}`;
-            
+
             const bubbleDiv = document.createElement('div');
             bubbleDiv.className = `max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg px-4 py-2 ${
                 sender === currentUser 
                     ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' 
                     : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-200'
             }`;
-            
+
             const infoDiv = document.createElement('div');
-            infoDiv.className = `text-xs opacity-80 mb-1 ${
-                sender === currentUser ? 'text-blue-100' : 'text-gray-500'
-            }`;
-            infoDiv.textContent = `${sender} • ${timestamp}`;
-            
+            infoDiv.className = `text-xs opacity-80 mb-1 ${sender === currentUser ? 'text-blue-100' : 'text-gray-500'}`;
+            infoDiv.textContent = `${sender} • ${new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}`;
+
             const contentP = document.createElement('p');
             contentP.className = 'break-words';
             contentP.textContent = message;
-            
+
             bubbleDiv.appendChild(infoDiv);
             bubbleDiv.appendChild(contentP);
             messageDiv.appendChild(bubbleDiv);
             chatBox.appendChild(messageDiv);
-            
-            // Scroll to bottom
             chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Show notification if not the current user and tab is not active
-            if (sender !== currentUser && document.hidden) {
-                if (Notification.permission === "granted") {
-                    new Notification(`New message from ${sender}`, {
-                        body: message,
-                        icon: '{% static "img/notification-icon.png" %}'
-                    });
-                }
+
+            if (sender !== currentUser && document.hidden && Notification.permission === "granted") {
+                new Notification(`New message from ${sender}`, {
+                    body: message,
+                    icon: '{% static "img/notification-icon.png" %}'
+                });
             }
         };
 
-        socket.onclose = function(e) {
+        chatSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
-            
-            // Show reconnection message
+
             const errorDiv = document.createElement('div');
             errorDiv.className = 'text-center text-red-500 text-sm py-2';
             errorDiv.textContent = 'Connection lost. Trying to reconnect...';
             chatBox.appendChild(errorDiv);
-            
-            // Attempt to reconnect after 5 seconds
+
             setTimeout(() => {
                 window.location.reload();
             }, 5000);
         };
 
-        // Send message on button click
-        sendButton.onclick = function() {
-            sendMessage();
-        };
-
-        // Send message on Enter key
+        sendButton.onclick = sendMessage;
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
@@ -151,14 +128,11 @@
         function sendMessage() {
             const message = messageInput.value.trim();
             if (message) {
-                socket.send(JSON.stringify({
-                    'message': message
-                }));
+                chatSocket.send(JSON.stringify({ message }));
                 messageInput.value = '';
             }
         }
 
-        // Focus input field
         messageInput.focus();
     });
 </script>

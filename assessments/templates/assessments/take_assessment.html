@@ -16,6 +16,7 @@
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
+                        {# Display non-field errors #}
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 {% for error in form.non_field_errors %}
@@ -28,7 +29,7 @@
                         {% for field in form.visible_fields %}
                             <div class="mb-4">
                                 <p class="fw-bold mb-2">{{ field.label }}</p>
-                                <div class="form-check-group">
+                                <div class="form-check-group"> {# Custom class for radio button group #}
                                     {% for choice_id, choice_text in field.field.choices %}
                                         <div class="form-check">
                                             <input type="radio" 
@@ -63,6 +64,7 @@
 
 {% block extra_css %}
 <style>
+    /* Optional: Basic styling for the radio button groups */
     .form-check-group .form-check {
         margin-bottom: 0.5rem;
     }
@@ -74,40 +76,80 @@
 {% endblock %}
 
 {% block extra_js %}
+{# Use json_script to safely pass JSON data from Django context to JavaScript #}
+<script id="assessment_questions_data_json" type="application/json">
+    {{ assessment_questions_data|safe }}
+</script>
+<script id="approved_therapists_json_data" type="application/json">
+    {{ approved_therapists_json|safe }}
+</script>
+
 <script>
-    const assessmentQuestions = JSON.parse('{{ assessment.question_set.all|json_script:"assessment_questions_json" }}');
-    const approvedTherapists = JSON.parse('{{ approved_therapists_json|escapejs }}');
+    console.log("Script loaded."); // DEBUG: Confirm script loads
+
+    let assessmentQuestionsData;
+    let approvedTherapists;
+    try {
+        assessmentQuestionsData = JSON.parse(document.getElementById('assessment_questions_data_json').textContent);
+        approvedTherapists = JSON.parse(document.getElementById('approved_therapists_json_data').textContent);
+        console.log("Parsed assessmentQuestionsData:", assessmentQuestionsData); // DEBUG
+        console.log("Parsed approvedTherapists:", approvedTherapists); // DEBUG
+    } catch (e) {
+        console.error("Error parsing initial JSON data from script tags:", e); // CRITICAL DEBUG
+    }
+    
     const takeAssessmentForm = document.querySelector('.needs-validation');
+    
     const aiFeedbackInput = document.createElement('input');
     aiFeedbackInput.type = 'hidden';
     aiFeedbackInput.name = 'ai_feedback_json';
     takeAssessmentForm.appendChild(aiFeedbackInput);
 
     function collectAnswers() {
+        console.log("collectAnswers() called."); // DEBUG
         const answers = [];
         let totalScore = 0;
-        document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
-            const questionId = radio.name.split('_')[1];
-            const choiceId = radio.value;
-            
-            const question = assessmentQuestions.find(q => q.pk == questionId);
-            const choice = question.fields.choice_set.find(c => c.pk == choiceId);
-            
-            if (question && choice) {
-                answers.push({
-                    question_text: question.fields.text,
-                    choice_text: choice.fields.text,
-                    score: choice.fields.score
-                });
-                totalScore += choice.fields.score;
+        
+        assessmentQuestionsData.forEach(questionData => {
+            const questionId = questionData.pk;
+            const radioName = `question_${questionId}`;
+            const selectedRadio = document.querySelector(`input[name="${radioName}"]:checked`);
+
+            if (selectedRadio) {
+                const choiceId = parseInt(selectedRadio.value);
+                const questionText = questionData.fields.text;
+                const selectedChoice = questionData.fields.choices.find(c => c.pk === choiceId);
+
+                if (selectedChoice) {
+                    answers.push({
+                        question_text: questionText,
+                        choice_text: selectedChoice.fields.text,
+                        score: selectedChoice.fields.score
+                    });
+                    totalScore += selectedChoice.fields.score;
+                }
+            } else {
+                console.warn(`Question ${questionId} (${questionData.fields.text}) had no selected radio button.`); // DEBUG: Check for unselected questions
             }
         });
+        console.log("Collected Answers:", answers); // DEBUG
+        console.log("Calculated Total Score:", totalScore); // DEBUG
         return { answers, totalScore };
     }
 
     async function generateAiFeedback(answers, totalScore, assessmentName, approvedTherapists) {
+        console.log("generateAiFeedback() called."); // DEBUG
         const promptParts = [
             "You are an empathetic AI assistant specializing in mental health assessment feedback. ",
+            "A user has just completed a mental health assessment. Your task is to provide constructive, supportive, and actionable feedback based on their answers and total score. ",
+            "The feedback should include:\n",
+            "1. A summary of their performance/score on the assessment.\n",
+            "2. Empathetic insights related to their responses.\n",
+            "3. General recommendations for next steps (e.g., mindfulness, seeking professional help, lifestyle adjustments).\n",
+            "4. (Optional, if applicable) Suggestions for specific types of therapists (e.g., CBT, trauma-informed) from the provided list of available therapists.\n",
+            "5. (Optional, if applicable) Links to relevant educational resources (e.g., articles on anxiety management, stress reduction techniques).",
+            "6. (Optional, if applicable) Mention of potential areas of concern without diagnosing, using compassionate language.\n\n",
+            "Provide the response in a structured JSON format with the following keys: 'summary', 'insights', 'recommendations', 'therapist_types' (list), 'resource_links' (list of dicts with 'title' and 'url'), 'potential_concerns' (list).\n\n",
             `Assessment Name: ${assessmentName}\n`,
             `Total Score: ${totalScore}\n`,
             "User's Answers:\n"
@@ -119,19 +161,25 @@
         });
 
         if (approvedTherapists && approvedTherapists.length > 0) {
-            promptParts.push("\nAvailable Therapists:\n");
+            promptParts.push("\nAvailable Therapists (recommend from this list if relevant, focusing on specialization and location):\n");
             approvedTherapists.forEach(therapist => {
-                promptParts.push(`- ${therapist.username} (Specialization: ${therapist.specialization || 'N/A'})\n`);
+                promptParts.push(`- ${therapist.username} (Specialization: ${therapist.specialization || 'N/A'}, Location: ${therapist.location || 'N/A'}, Bio: ${therapist.bio ? therapist.bio.substring(0, 100) + '...' : 'N/A'})\n`);
             });
         }
 
         const prompt = promptParts.join("");
+        console.log("Prompt sent to Gemini (truncated for console):", prompt.substring(0, 500) + "..."); // DEBUG LOG (truncate long prompts)
+        console.log("Full prompt length:", prompt.length); // DEBUG
 
         try {
-            const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
             const payload = {
                 contents: chatHistory,
                 generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                    topP: 1,
                     responseMimeType: "application/json",
                     responseSchema: {
                         type: "OBJECT",
@@ -139,9 +187,12 @@
                             "summary": { "type": "STRING" },
                             "insights": { "type": "STRING" },
                             "recommendations": { "type": "STRING" },
-                            "therapist_types": { "type": "ARRAY", "items": { "type": "STRING" } },
-                            "resource_links": { 
-                                "type": "ARRAY", 
+                            "therapist_types": {
+                                "type": "ARRAY",
+                                "items": { "type": "STRING" }
+                            },
+                            "resource_links": {
+                                "type": "ARRAY",
                                 "items": {
                                     "type": "OBJECT",
                                     "properties": {
@@ -150,59 +201,119 @@
                                     }
                                 }
                             },
-                            "potential_concerns": { "type": "ARRAY", "items": { "type": "STRING" } }
+                            "potential_concerns": {
+                                "type": "ARRAY",
+                                "items": { "type": "STRING" }
+                            }
                         },
                         "required": ["summary", "insights", "recommendations"]
                     }
                 }
             };
             
+            const apiKey = "AIzaSyA60sUsw18bRuQZp2Vu9oYmwIIJ-zinkeA"; // Your actual API key
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; 
+            
+            console.log("Attempting fetch to:", apiUrl); // DEBUG
+            console.log("Fetch payload (stringified):", JSON.stringify(payload).substring(0, 500) + "..."); // DEBUG (truncate payload)
+
+            // Show loading indicator
             const submitButton = document.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating Feedback...';
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=`, {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const result = await response.json();
+            
+            console.log("Fetch response status:", response.status); // DEBUG
+            console.log("Fetch response ok:", response.ok); // DEBUG
+            
+            // Check if response is OK before trying to parse JSON
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("HTTP Error from Gemini API:", response.status, response.statusText, errorText); // CRITICAL DEBUG
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+            }
 
+            const result = await response.json();
+            console.log("Raw API Result:", result); // DEBUG
+
+            // Hide loading indicator
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>Submit Assessment';
 
-            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                const jsonResponseText = result.candidates[0].content.parts[0].text.replace(/```json\n?|\n?```/g, '').trim();
-                return JSON.parse(jsonResponseText);
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                const jsonResponseText = result.candidates[0].content.parts[0].text;
+                console.log("Raw JSON Response Text from API:", jsonResponseText); // DEBUG
+                const cleanedJsonText = jsonResponseText.replace(/```json\n?|\n?```/g, '').trim();
+                console.log("Cleaned JSON Response Text:", cleanedJsonText); // DEBUG
+                try {
+                    return JSON.parse(cleanedJsonText);
+                } catch (e) {
+                    console.error("JSON parsing error from LLM response:", e);
+                    console.error("Raw LLM response text (before cleaning):", jsonResponseText);
+                    return {
+                        summary: "Error processing AI feedback.",
+                        insights: "There was an issue parsing the AI's response.",
+                        recommendations: "Please try again later or contact support."
+                    };
+                }
+            } else {
+                console.error("LLM response structure unexpected or empty. Result:", result);
+                return {
+                    summary: "No AI feedback generated.",
+                    insights: "The AI did not provide a valid response.",
+                    recommendations: "Please try again later or contact support."
+                };
             }
-            return {
-                summary: "No AI feedback generated.",
-                insights: "The AI did not provide a valid response.",
-                recommendations: "Please try again later."
-            };
+
         } catch (e) {
-            console.error("Error:", e);
+            console.error("Error calling Gemini API (catch block):", e); // CRITICAL DEBUG
+            const submitButton = document.querySelector('button[type="submit"]');
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>Submit Assessment';
             return {
-                summary: "Failed to generate AI feedback.",
+                summary: "Failed to generate AI feedback due to API error.",
                 insights: "There was a problem connecting to the AI service.",
-                recommendations: "Please check your connection and try again."
+                recommendations: "Please check your internet connection or try again later."
             };
         }
     }
 
+    // Intercept form submission
     takeAssessmentForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default form submission
         
+        console.log("Form submission intercepted."); // DEBUG
+
+        // Basic client-side validation
         if (!takeAssessmentForm.checkValidity()) {
             event.stopPropagation();
             takeAssessmentForm.classList.add('was-validated');
+            console.warn("Form validation failed."); // DEBUG
             return;
         }
+        console.log("Form validation passed."); // DEBUG
 
         const { answers, totalScore } = collectAnswers();
-        const aiFeedback = await generateAiFeedback(answers, totalScore, "{{ assessment.name|escapejs }}", approvedTherapists);
+        const assessmentName = "{{ assessment.name|escapejs }}"; // Pass assessment name
+
+        // Generate AI feedback
+        console.log("Calling generateAiFeedback..."); // DEBUG
+        const aiFeedback = await generateAiFeedback(answers, totalScore, assessmentName, approvedTherapists);
+        console.log("AI Feedback received from generateAiFeedback:", aiFeedback); // DEBUG
+
+        // Set the AI feedback to the hidden input field
         aiFeedbackInput.value = JSON.stringify(aiFeedback);
-        takeAssessmentForm.submit();
+        console.log("Hidden AI feedback input set:", aiFeedbackInput.value.substring(0, 100) + "..."); // DEBUG
+
+        takeAssessmentForm.submit(); 
+        console.log("Form re-submitted programmatically."); // DEBUG
     });
 </script>
 {% endblock %}
